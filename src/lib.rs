@@ -190,7 +190,11 @@ impl<const N: usize, T> Deref for MultiVec<N, T> {
             offsets: &self.offsets,
             refs: &self.refs,
         }));
-        self.refs.add(ptr as *mut dyn Placeholder);
+        self.refs.add(unsafe {
+            std::mem::transmute::<*mut (dyn Placeholder + '_), *mut (dyn Placeholder + 'static)>(
+                ptr,
+            )
+        });
         unsafe { &*ptr }
     }
 }
@@ -202,7 +206,11 @@ impl<const N: usize, T> DerefMut for MultiVec<N, T> {
             offsets: &self.offsets,
             refs: &self.refs,
         }));
-        self.refs.add(ptr as *mut dyn Placeholder);
+        self.refs.add(unsafe {
+            std::mem::transmute::<*mut (dyn Placeholder + '_), *mut (dyn Placeholder + 'static)>(
+                ptr,
+            )
+        });
         unsafe { &mut *ptr }
     }
 }
@@ -235,7 +243,12 @@ macro_rules! impl_index {
                     refs: self.refs,
                 }));
                 let refs = unsafe { &*self.refs };
-                refs.add(ptr as *mut dyn Placeholder);
+                refs.add(unsafe {
+                    ::std::mem::transmute::<
+                        *mut (dyn Placeholder + '_),
+                        *mut (dyn Placeholder + 'static),
+                    >(ptr)
+                });
                 unsafe { &*ptr }
             }
         }
@@ -257,7 +270,12 @@ macro_rules! impl_index {
                     refs: *refs,
                 }));
                 let refs = unsafe { &*self.refs };
-                refs.add(ptr as *mut dyn Placeholder);
+                refs.add(unsafe {
+                    ::std::mem::transmute::<
+                        *mut (dyn Placeholder + '_),
+                        *mut (dyn Placeholder + 'static),
+                    >(ptr)
+                });
                 unsafe { &mut *ptr }
             }
         }
