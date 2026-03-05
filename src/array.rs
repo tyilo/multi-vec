@@ -1,5 +1,6 @@
 pub(crate) trait NonEmptyArray<const N_MINUS_ONE: usize> {
     type Item;
+    #[allow(unused)]
     const N: usize;
 }
 

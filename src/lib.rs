@@ -181,7 +181,7 @@ impl<const N: usize, T> MultiVec<N, T> {
     }
 }
 
-impl<const N: usize, T> Deref for MultiVec<N, T> {
+impl<const N: usize, T: 'static> Deref for MultiVec<N, T> {
     type Target = MultiVecRef<N, T>;
 
     fn deref(&self) -> &Self::Target {
@@ -195,7 +195,7 @@ impl<const N: usize, T> Deref for MultiVec<N, T> {
     }
 }
 
-impl<const N: usize, T> DerefMut for MultiVec<N, T> {
+impl<const N: usize, T: 'static> DerefMut for MultiVec<N, T> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         let ptr = Box::into_raw(Box::new(MultiVecRef {
             slice: self.inner.as_mut_slice() as *mut _,
@@ -223,7 +223,7 @@ impl<T> IndexMut<usize> for MultiVecRef<0, T> {
 
 macro_rules! impl_index {
     ($n:expr) => {
-        impl<T: Debug> Index<usize> for MultiVecRef<$n, T> {
+        impl<T: 'static + Debug> Index<usize> for MultiVecRef<$n, T> {
             type Output = MultiVecRef<{ $n - 1 }, T>;
 
             fn index(&self, index: usize) -> &Self::Output {
@@ -240,7 +240,7 @@ macro_rules! impl_index {
             }
         }
 
-        impl<T: Debug> IndexMut<usize> for MultiVecRef<$n, T> {
+        impl<T: 'static + Debug> IndexMut<usize> for MultiVecRef<$n, T> {
             fn index_mut(&mut self, index: usize) -> &mut Self::Output {
                 let MultiVecRef {
                     slice,
